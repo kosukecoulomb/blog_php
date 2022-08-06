@@ -1,3 +1,24 @@
+<?php
+include 'lib/connect.php';
+
+$err = null;
+
+if(isset($_POST['name']) && isset($_POST['password'])){
+  $db = new connect();
+  $select = "SELECT * FROM users WHERE name=:name";
+  $stmt = $db->query($select, array(':name' => $_POST['name']));
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  if($result && password_verify($_POST['password'], $result['password'])){
+    session_start();
+    $_SESSION['id'] = $result['id'];
+    header('Location: backend.php');
+  } else {
+    $err = "ログインできませんでした。";
+  }
+}
+
+?>
+
 <!doctype html>
 <html lang="ja">
   <head>
@@ -30,8 +51,15 @@
   <body class="text-center">
 
 <main class="form-signin">
-  <form>
+  <form action="login.php" method="post">
     <h1 class="h3 mb-3 fw-normal">ログインする</h1>
+
+    <?php
+    if(!is_null($err)){
+      echo '<div class="alert alert-danger">'.$err.'</div>';
+    }
+    ?>
+
     <label class="visually-hidden">ユーザ名</label>
     <input type="text" name="name" class="form-control" placeholder="ユーザ名" required autofocus>
     <label class="visually-hidden">パスワード</label>
