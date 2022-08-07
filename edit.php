@@ -1,24 +1,54 @@
 <?php
 include 'lib/secure.php';
 include 'lib/connect.php';
-
 include 'lib/queryArticle.php';
 include 'lib/article.php';
 
 $title = "";        // タイトル
 $body = "";         // 本文
+$id = "";
 $title_alert = "";  // タイトルのエラー文言
 $body_alert = "";   // 本文のエラー文言
 
-if (!empty($_POST['title']) && !empty($_POST['body'])) {
+if (isset($_GET['id'])) {
+    $queryArticle = new QueryArticle();
+    $article = $queryArticle->find($_GET['id']);
+
+    if($article){
+        $id = $article->getId();
+        $title = $article->getTitle();
+        $body = $article->getBody();
+    } else {
+        // 編集する記事データが存在しないとき
+        header('Location: backend.php');
+        exit;
+    }
+} else if (!empty($_POST['id']) && !empty($_POST['title']) && !empty($_POST['body'])) {
+    // id, titleとbodyがPOSTメソッドで送信されたとき
     $title = $_POST['title'];
     $body = $_POST['body'];
-    $article = new Article();
-    $article->setTitle($title);
-    $article->setBody($body);
-    $article->save();
+
+    $queryArticle = new QueryArticle();
+    $article = $queryArticle->find($_POST['id']);
+    if ($article) {
+        // 記事データが存在していれば、タイトルと本文を変更して上書き保存
+        $article->setTitle($title);
+        $article->setBody($body);
+        $article->save();
+    }
     header('Location: backend.php');
+    exit;
 } else if (!empty($_POST)) {
+    // POSTメソッドで送信されたが、titleかbodyが足りないとき
+    if (!empty($_POST['id'])) {
+        $id = $_POST['id'];
+    } else {
+        // 編集する記事IDがセットされていなければ、backend.phpへ戻る
+        header('Location: backend.php');
+        exit;
+    }
+
+    // 存在するほうは変数へ、ない場合空文字にしてフォームのvalueに設定する
     if (!empty($_POST['title'])) {
         $title = $_POST['title'];
     } else {
