@@ -112,7 +112,8 @@ if (isset($_GET['id'])) {
 
                 <h1>記事の投稿</h1>
 
-                <form action="post.php" method="post">
+                <form action="edit.php" method="post">
+                    <input type="hidden" name="id" value="<?php echo $id ?>">
                     <div class="mb-3">
                         <label class="form-label">タイトル</label>
                         <?php echo !empty($title_alert) ? '<div class="alert alert-danger">' . $title_alert . '</div>' : '' ?>
