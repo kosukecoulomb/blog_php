@@ -3,6 +3,8 @@ class QueryArticle extends connect
 {
     private $article;
 
+    const THUMBS_WIDTH = 200;
+
     public function __construct()
     {
         parent::__construct();
@@ -11,6 +13,10 @@ class QueryArticle extends connect
     public function setArticle(Article $article)
     {
         $this->article = $article;
+    }
+
+    private function saveFile($old_name){
+
     }
 
     public function save()
@@ -32,6 +38,11 @@ class QueryArticle extends connect
             $stmt->execute();
         } else {
             // IDがなければ新規作成
+            // ===== ここから変更。↑これ以前にあった画像保存処理は全てsaveFile()に移動予定 =====
+            if ($file = $this->article->getFile()) {
+                $this->article->setFilename($this->saveFile($file['tmp_name']));
+                $filename = $this->article->getFilename();
+            }
             if ($file = $this->article->getFile()) {
                 $old_name = $file['tmp_name'];
                 $new_name = date('YmdHis') . mt_rand();
