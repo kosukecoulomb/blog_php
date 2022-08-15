@@ -68,22 +68,31 @@ class QueryArticle extends connect
     {
         $title = $this->article->getTitle();
         $body = $this->article->getBody();
-        $filename = null;
+        $filename = $this->article->getFilename();
 
         if ($this->article->getId()) {
             // IDがあるときは上書き
             $id = $this->article->getId();
-            $title = $this->article->getTitle();
-            $body = $this->article->getBody();
+
+            if ($file = $this->article->getFile()){
+                if ($this->article->getFilename()){
+                    unlink(__DIR__.'/../album/thumbs-'.$this->article->getFilename());
+                    unlink(__DIR__.'/../album/'.$this->article->getFilename());
+                }
+                $this->article->setFilename($this->saveFile($file['tmp_name']));
+                $filename = $this->article->getFilename();
+            }
+
             $stmt = $this->dbh->prepare("UPDATE articles
-                SET title=:title, body=:body, updated_at=NOW() WHERE id=:id");
+                SET title=:title, body=:body, filename=:filename, updated_at=NOW() WHERE id=:id");
             $stmt->bindParam(':title', $title, PDO::PARAM_STR);
             $stmt->bindParam(':body', $body, PDO::PARAM_STR);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':filename', $filename, PDO::PARAM_STR);
             $stmt->execute();
+
         } else {
             // IDがなければ新規作成
-            // ===== ここから変更。↑これ以前にあった画像保存処理は全てsaveFile()に移動予定 =====
             if ($file = $this->article->getFile()) {
                 $this->article->setFilename($this->saveFile($file['tmp_name']));
                 $filename = $this->article->getFilename();
@@ -93,6 +102,7 @@ class QueryArticle extends connect
             $stmt->bindParam(':title', $title, PDO::PARAM_STR);
             $stmt->bindParam(':body', $body, PDO::PARAM_STR);
             $stmt->bindParam(':filename', $filename, PDO::PARAM_STR);
+            $stmt->bindParam(':filename', $filename, PDP::PARAM_STR);
             $stmt->execute();
         }
     }
