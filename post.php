@@ -1,7 +1,6 @@
 <?php
 include 'lib/secure.php';
 include 'lib/connect.php';
-
 include 'lib/queryArticle.php';
 include 'lib/article.php';
 
