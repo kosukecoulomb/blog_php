@@ -13,17 +13,20 @@
 <body>
     <div class="menu-wrapper container">
         <h1 class="logo">Café Progate</h1>
-        <div class="menu-items">
-            <?php foreach ($menus as $menu) : ?>
-                <div class="menu-item">
-                    <!-- <img>タグのsrc属性に、$menuのimageプロパティを表示してください -->
-                    <img src="<?php echo $menu->image ?>">
-                    <h3 class="menu-item-name"><?php echo $menu->name ?></h3>
-                    <!-- <p>タグの中に、$menuのpriceプロパティを表示してください -->
-                    <p class="price">¥<?php echo $menu->price ?></p>
-                </div>
-            <?php endforeach ?>
-        </div>
+        <form method="post" action="confirm.php">
+            <div class="menu-items">
+                <?php foreach ($menus as $menu) : ?>
+                    <div class="menu-item">
+                        <img src="<?php echo $menu->getImage() ?>" class="menu-item-image">
+                        <h3 class="menu-item-name"><?php echo $menu->getName() ?></h3>
+                        <p class="price">¥<?php echo $menu->getTaxIncludedPrice() ?>（税込）</p>
+                        <input type="text" value="0" name="<?php echo $menu->getName() ?>">
+                        <span>個</span>
+                    </div>
+                <?php endforeach ?>
+            </div>
+            <input type="submit" value="注文する">
+        </form>
     </div>
 </body>
 
