@@ -10,7 +10,6 @@ if (!empty($_GET['id'])) {
 } else {
     $article = null;
 }
-
 ?>
 
 <!doctype html>
